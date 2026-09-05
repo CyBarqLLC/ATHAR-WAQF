@@ -12,9 +12,15 @@
   /* ---------- Header ---------- */
   const header = $('#header');
   if (header) {
-    const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 30);
+    const onScroll = () => {
+      header.classList.toggle('scrolled', window.scrollY > 30);
+      /* reading progress — fine gold thread along the bar's base */
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      header.style.setProperty('--scroll-p', max > 0 ? Math.min(window.scrollY / max, 1).toFixed(4) : 0);
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
   }
 
   /* ---------- Mobile dropdown nav ---------- */
