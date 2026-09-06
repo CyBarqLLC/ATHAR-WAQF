@@ -64,6 +64,7 @@
             '<a href="programs.html">برامج أثر</a>' +
             '<a href="programs.html#work">أعمالنا الإعلامية</a>' +
             '<a href="programs.html#calendar">رزنامة أثر</a>' +
+            '<a href="museum.html">متحف أثر الوقفي</a>' +
           '</nav></div>' +
           '<div><h4>مبادرات</h4><nav aria-label="روابط المبادرات">' +
             '<a href="certificate.html">الوقف المعنوي</a>' +
