@@ -1,5 +1,5 @@
 /* ============================================================
-   مؤسسة أثر — السلوك المشترك بين الصفحات
+   مؤسسة أثر، السلوك المشترك بين الصفحات
    Vanilla JS، بلا مكتبات.
    ============================================================ */
 (function () {
@@ -73,7 +73,7 @@
           '</nav></div>' +
         '</div>' +
         '<div class="footer-bottom">' +
-          '<span>© <span class="num">' + new Date().getFullYear() + '</span> مؤسسة أثر للإعلام الوقفي — جميع الحقوق محفوظة</span>' +
+          '<span>© <span class="num">' + new Date().getFullYear() + '</span> مؤسسة أثر للإعلام الوقفي، جميع الحقوق محفوظة</span>' +
           '<span class="footer-social">' +
             '<a href="https://www.instagram.com/atharwaqf" target="_blank" rel="noopener" aria-label="إنستقرام"><svg viewBox="0 0 24 24" fill-rule="evenodd" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.4a4.6 4.6 0 1 1 0 9.2 4.6 4.6 0 0 1 0-9.2zm0 2a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2zM17.7 5.9a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg></a>' +
             '<a href="https://x.com/atharwaqf" target="_blank" rel="noopener" aria-label="إكس"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-7.1 8.1L23.2 22h-6.5l-5.1-6.7L5.7 22H2.6l7.6-8.7L1.6 2h6.7l4.6 6.1L18.9 2zm-1.1 18h1.8L7.3 3.9H5.4L17.8 20z"/></svg></a>' +

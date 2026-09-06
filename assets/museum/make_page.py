@@ -11,7 +11,7 @@ HEAD = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>متحف أثر الوقفي — مؤسسة أثر للإعلام الوقفي</title>
+<title>متحف أثر الوقفي، مؤسسة أثر للإعلام الوقفي</title>
 <meta name="description" content="متحف أثر الوقفي في عمّان: لوحات وقفية تُعرض مطبوعة، تروي كل واحدة منها فكرة وقفية بصورة وكلمة، ويمكن تنزيلها بجودة الطباعة.">
 <link rel="canonical" href="https://atharwaqf.com/museum.html">
 <meta property="og:type" content="website">
@@ -21,6 +21,7 @@ HEAD = '''<!DOCTYPE html>
 <link rel="icon" type="image/svg+xml" href="assets/img/logo-v.svg">
 <link rel="preload" href="assets/fonts/Qomra-Light.otf" as="font" type="font/otf" crossorigin>
 <link rel="stylesheet" href="assets/css/athar.css?v=1">
+<script>document.documentElement.className+=" js";</script>
 </head>
 <body>
 <a href="#main" class="skip-link">تجاوز إلى المحتوى</a>
@@ -28,7 +29,7 @@ HEAD = '''<!DOCTYPE html>
 <header class="header" id="header">
   <div class="container">
     <div class="bar">
-      <a href="index.html" class="brand" aria-label="مؤسسة أثر — الصفحة الرئيسية">
+      <a href="index.html" class="brand" aria-label="مؤسسة أثر، الصفحة الرئيسية">
         <img src="assets/img/logo-h.svg" alt="مؤسسة أثر للإعلام الوقفي" width="112" height="24">
       </a>
       <nav class="nav" id="nav" aria-label="التنقل الرئيسي">
@@ -73,7 +74,7 @@ HEAD = '''<!DOCTYPE html>
 CARD = '''        <article class="banner-card">
           <figure><img src="assets/museum/preview/{slug}.jpg" alt="{title}" width="1000" height="2000" loading="lazy"></figure>
           <h3>{title}</h3>{subline}
-          <a class="dl" href="assets/museum/full/{slug}.png" download="{title}.png">
+          <a class="dl" href="assets/museum/print/{slug}.jpg" download="{title}.jpg">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13"/><path d="M7 12l5 5 5-5"/><path d="M4 21h16"/></svg>
             تنزيل اللوحة
           </a>
@@ -83,7 +84,7 @@ CARD = '''        <article class="banner-card">
 FOOT = '''      </div>
 
       <div class="museum-note">
-        <span>{count} لوحة وقفية — ملفات PNG بجودة الطباعة، مقاس 25×50 سم.</span>
+        <span>{count} لوحة وقفية، ملفات بجودة الطباعة، 300 نقطة/إنش، مقاس 25×50 سم.</span>
         <span>للتنسيق حول عرض اللوحات: <a href="contact.html">تواصلوا معنا</a></span>
       </div>
     </div>
@@ -105,7 +106,7 @@ def build_page():
         if not os.path.exists(os.path.join(FULL, slug + '.png')):
             continue
         n += 1
-        subline = '\\n          <p>%s</p>' % sub if sub else ''
+        subline = '\n          <p>%s</p>' % sub if sub else ''
         cards.append(CARD.format(slug=slug, title=title, subline=subline))
     html = HEAD + ''.join(cards) + FOOT.format(count=n)
     out = os.path.join(SITE, 'museum.html')

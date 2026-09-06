@@ -1,5 +1,5 @@
 /* ============================================================
-   مؤسسة أثر للإعلام الوقفي — نظام التصميم
+   مؤسسة أثر للإعلام الوقفي، نظام التصميم
    تحريري، فاتح، مينمال. HTML5 / CSS3 فقط.
    ============================================================ */
 
@@ -308,12 +308,12 @@ p:last-child{margin-bottom:0}
 @media (max-width:760px){.steps{grid-template-columns:1fr;gap:26px}}
 
 /* ---------- 19. الحركة ---------- */
-[data-r]{opacity:0;transform:translateY(14px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
-[data-r].in{opacity:1;transform:none}
-[data-r-group] > *{opacity:0;transform:translateY(14px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
-[data-r-group].in > *{opacity:1;transform:none}
+.js [data-r]{opacity:0;transform:translateY(14px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.js [data-r].in{opacity:1;transform:none}
+.js [data-r-group] > *{opacity:0;transform:translateY(14px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.js [data-r-group].in > *{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){
-  [data-r],[data-r-group] > *{opacity:1;transform:none;transition:none}
+  .js [data-r],.js [data-r-group] > *{opacity:1;transform:none;transition:none}
 }
 
 /* ---------- 20. حماية الوسائط ---------- */
