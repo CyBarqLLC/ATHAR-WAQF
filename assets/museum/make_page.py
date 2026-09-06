@@ -68,10 +68,10 @@ HEAD = '''<!DOCTYPE html>
 
   <section class="section section--rule">
     <div class="container">
-      <div class="museum-grid" data-r-group>
+      <div class="museum-grid">
 '''
 
-CARD = '''        <article class="banner-card">
+CARD = '''        <article class="banner-card" data-r>
           <figure><img src="assets/museum/preview/{slug}.jpg" alt="{title}" width="1000" height="2000" loading="lazy"></figure>
           <h3>{title}</h3>{subline}
           <a class="dl" href="assets/museum/print/{slug}.jpg" download="{title}.jpg">

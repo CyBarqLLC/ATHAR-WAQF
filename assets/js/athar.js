@@ -100,8 +100,14 @@
         el.classList.add('in');
         io.unobserve(el);
       });
-    }, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: [0, 0.1], rootMargin: '0px 0px -8% 0px' });
     items.forEach(function (el) { io.observe(el); });
+    setTimeout(function () {
+      items.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (!el.classList.contains('in') && r.top < window.innerHeight && r.bottom > 0) el.classList.add('in');
+      });
+    }, 1200);
   } else {
     items.forEach(function (el) { el.classList.add('in'); });
   }
