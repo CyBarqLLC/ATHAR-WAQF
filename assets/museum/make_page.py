@@ -51,12 +51,13 @@ HEAD = '''<!DOCTYPE html>
 
   <section class="page-head">
     <div class="container">
-      <span class="eyebrow" data-r>معرض دائم في عمّان</span>
+      <span class="eyebrow" data-r>متحف لوحات وقفية في عمّان</span>
       <h1 class="display" data-r>متحف أثر الوقفي</h1>
       <div class="museum-intro" data-r>
         <p class="lead">
-          لوحاتٌ وقفية تُطبع وتُعرض في متحفٍ وقفي في عمّان؛ كل لوحةٍ تحمل فكرة وقفية
-          واحدة بصورةٍ هادئة وكلمةٍ موجزة، لتقول للزائر إنّ للوقف وجوهًا أكثر مما نظن.
+          لوحاتٌ وقفية تلهم الناس بأفكار حول الوقف معروضة في متحفٍ خاص لها في عمّان؛
+          كل لوحةٍ تحمل فكرة وقفية واحدة بصورةٍ هادئة وكلمةٍ موجزة، لتقول لمن يراها
+          إنّ للوقف وجوهًا أكثر مما نظن.
         </p>
         <p class="muted">
           اللوحات متاحة هنا بجودة الطباعة الكاملة، لمن أراد عرضها في مسجدٍ أو مدرسةٍ
@@ -72,7 +73,10 @@ HEAD = '''<!DOCTYPE html>
 '''
 
 CARD = '''        <article class="banner-card" data-r>
-          <figure><img src="assets/museum/preview/{slug}.jpg" alt="{title}" width="1000" height="2000" loading="lazy"></figure>
+          <figure><img src="assets/museum/preview/{slug}.jpg"
+            srcset="assets/museum/preview/sm/{slug}.jpg 500w, assets/museum/preview/{slug}.jpg 1000w"
+            sizes="(max-width:560px) min(64vw,290px), (max-width:960px) 44vw, 30vw"
+            alt="{title}" width="1000" height="2000" loading="{load}" decoding="async" fetchpriority="{prio}"></figure>
           <h3>{title}</h3>{subline}
           <a class="dl" href="assets/museum/print/{slug}.jpg" download="{title}.jpg">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13"/><path d="M7 12l5 5 5-5"/><path d="M4 21h16"/></svg>
@@ -84,7 +88,7 @@ CARD = '''        <article class="banner-card" data-r>
 FOOT = '''      </div>
 
       <div class="museum-note">
-        <span>{count} لوحة وقفية، ملفات بجودة الطباعة، 300 نقطة/إنش، مقاس 25×50 سم.</span>
+        <span>اللوحات معدّة للطباعة بمقاس <span class="num">1</span> متر عرض × <span class="num">2</span> متر ارتفاع.</span>
         <span>للتنسيق حول عرض اللوحات: <a href="contact.html">تواصلوا معنا</a></span>
       </div>
     </div>
@@ -103,12 +107,13 @@ def build_page():
     cards = []
     n = 0
     for slug, fname, title, sub in BANNERS:
-        if not os.path.exists(os.path.join(FULL, slug + '.png')):
-            continue
         n += 1
         subline = '\n          <p>%s</p>' % sub if sub else ''
-        cards.append(CARD.format(slug=slug, title=title, subline=subline))
-    html = HEAD + ''.join(cards) + FOOT.format(count=n)
+        eager = n <= 2
+        cards.append(CARD.format(slug=slug, title=title, subline=subline,
+                                 load='eager' if eager else 'lazy',
+                                 prio='high' if eager else 'low'))
+    html = HEAD + ''.join(cards) + FOOT
     out = os.path.join(SITE, 'museum.html')
     io.open(out, 'w', encoding='utf-8').write(html)
     print('كُتبت الصفحة بـ', n, 'لوحة')
