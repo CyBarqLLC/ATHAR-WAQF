@@ -331,3 +331,45 @@
   .sel{flex:1 1 0;min-width:0}
   .tb{gap:12px}
 }
+
+/* ---------- تنويه المتجر: صغير، يظهر أول الصفحة ---------- */
+.store-notice{
+  margin:clamp(16px,2.2vw,26px) 0 0;max-width:40rem;
+  padding:11px 16px;border-inline-start:2px solid var(--gold);background:var(--sand);
+  font-size:.86rem;line-height:1.8;font-weight:400;color:var(--ink-70);text-align:start;
+}
+
+/* ---------- تصغير البطاقة ---------- */
+.pr-add{border-bottom:0;padding:2px 0}
+.pr-add:hover,.pr-add.is-done{border-color:transparent}
+.pr-order,.pr-go{padding:12px 18px}
+.pr-price b{font-size:clamp(1.6rem,2vw,1.95rem)}
+.qty-b{width:36px;height:38px}
+.qty-i{width:46px;height:38px}
+.pr-buy{gap:12px}
+@media (min-width:621px){
+  .pr-body{padding:clamp(22px,2.6vw,34px)}
+  .pr-name{font-size:clamp(1.4rem,1rem + 1vw,1.8rem)}
+  .pr-buy{padding:16px 24px 18px}
+}
+@media (min-width:981px){
+  .pr{grid-template-columns:minmax(0,.31fr) minmax(0,.69fr)}
+  .pr-specs,.pr-opts{margin-top:18px}
+}
+@media (max-width:620px){
+  .pr .media{aspect-ratio:16/10}
+  .pr-body{padding:16px 18px 14px}
+  .pr-name{font-size:1.15rem}
+  .pr-desc{margin-top:6px;font-size:.9rem;line-height:1.7}
+  .pr-specs{margin-top:10px}
+  .pr-specs div{padding:6px 0}
+  .pr-opts{margin-top:10px;gap:8px}
+  .pr-opt > span{font-size:.78rem}
+  .pr-opt select,.pr-opt input[type="text"]{padding:6px 0;font-size:.95rem}
+  .pr-buy{padding:12px 18px 14px;gap:10px}
+  .pr-price b{font-size:1.55rem}
+  .pr-qty > span{font-size:.74rem}
+  .mark{width:74px;height:16px;bottom:12px}
+}
+
+@media (max-width:620px){.shop-grid{gap:56px}}
