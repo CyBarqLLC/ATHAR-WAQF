@@ -73,14 +73,13 @@
       '<em class="pr-need" role="alert">اختر ' + esc(o.label) + ' أولًا</em></label>';
   }
 
-  var RINGS = '<svg class="rings" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="200" cy="150" r="46"/><circle cx="200" cy="150" r="84"/><circle cx="200" cy="150" r="122"/><circle cx="200" cy="150" r="160"/><circle cx="200" cy="150" r="198"/></g></svg>';
 
   function mediaHtml(p, tone) {
     if (p.image) {
       return '<div class="media"><img src="' + esc(p.image) + '" alt="' + esc(p.imageAlt || p.name) + '" width="960" height="720" loading="lazy" decoding="async"><span class="mark" aria-hidden="true"></span></div>';
     }
     if (p.tile) {
-      return '<div class="media media--tile" aria-hidden="true">' + RINGS +
+      return '<div class="media media--tile" aria-hidden="true">' +
         '<b class="tile-n num">' + esc(p.tile.n) + '</b><span class="tile-u">' + esc(p.tile.u || S.tileLabel || 'متراً · عمق البئر') + '</span><span class="mark"></span></div>';
     }
     return '';
@@ -93,11 +92,10 @@
     }).join('') + '</dl>';
   }
 
-  /* رقم البطاقة ضمن القائمة، ونقش حلقات خافت يملأ الفراغ بهوية أثر */
+  /* رقم البطاقة ضمن القائمة */
   function pad2(n) { return n < 10 ? '0' + n : String(n); }
   function bodyDeco(i) {
-    return RINGS.replace('class="rings"', 'class="rings pr-deco"') +
-      '<span class="pr-idx" aria-hidden="true"><span class="num">' + pad2(i + 1) + ' / ' + pad2(items.length) + '</span></span>';
+    return '<span class="pr-idx" aria-hidden="true"><span class="num">' + pad2(i + 1) + ' / ' + pad2(items.length) + '</span></span>';
   }
 
   function rowHtml(p, i, tone) {
