@@ -127,7 +127,7 @@
   }
 
   /* ---------- إقفال الوسائط: لا قائمة سياق ولا سحب ولا حفظ مباشر ---------- */
-  var MEDIA = 'img, video, canvas, picture, source, .strip, .gallery, .program-portrait, .figure-block, .pr-fig, .cat-fig, .cert-canvas, .frame, .brand, .footer-brand';
+  var MEDIA = 'img, video, canvas, picture, source, .strip, .gallery, .program-portrait, .figure-block, .media, .cert-canvas, .frame, .brand, .footer-brand';
   document.addEventListener('contextmenu', function (e) {
     var t = e.target;
     if (t && t.closest && t.closest(MEDIA)) e.preventDefault();

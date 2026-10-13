@@ -73,26 +73,38 @@
       '<em class="pr-need" role="alert">اختر ' + esc(o.label) + ' أولًا</em></label>';
   }
 
-  function rowHtml(p, n, i) {
-    var h = '<article class="pr' + (p.image ? ' pr--img' : '') + '" id="' + p.id + '" data-id="' + p.id + '" style="--i:' + i + '">';
-    h += '<span class="pr-n num" aria-hidden="true">' + (n < 10 ? '0' + n : n) + '</span>';
+  var RINGS = '<svg class="rings" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="200" cy="150" r="46"/><circle cx="200" cy="150" r="84"/><circle cx="200" cy="150" r="122"/><circle cx="200" cy="150" r="160"/><circle cx="200" cy="150" r="198"/></g></svg>';
+
+  function mediaHtml(p, tone, cat) {
     if (p.image) {
-      h += '<figure class="pr-fig"><img src="' + esc(p.image) + '" alt="' + esc(p.name) + '" width="800" height="1000" loading="lazy" decoding="async"></figure>';
+      return '<div class="media"><img src="' + esc(p.image) + '" alt="' + esc(p.name) + '" width="960" height="720" loading="lazy" decoding="async"><span class="mark" aria-hidden="true"></span></div>';
     }
+    if (p.tile) {
+      return '<div class="media media--tile t' + tone + '" aria-hidden="true">' + RINGS +
+        '<b class="tile-n num">' + esc(p.tile.n) + '</b><span class="tile-u">' + esc(p.tile.u || cat.tileLabel || '') + '</span><span class="mark"></span></div>';
+    }
+    return '';
+  }
+
+  function rowHtml(p, i, tone, cat) {
+    var h = '<article class="pr" id="' + p.id + '" data-id="' + p.id + '" style="--i:' + i + '">';
+    h += mediaHtml(p, tone, cat);
     h += '<div class="pr-body"><h3 class="pr-name">' + esc(p.name) + '</h3><p class="pr-desc">' + esc(p.desc) + '</p>';
-    if (p.specs && p.specs.length) {
-      h += '<dl class="pr-specs">' + p.specs.map(function (s) {
+    var specs = (p.specs || []).filter(function (s) { return !(p.tile && s.k === 'العمق'); });
+    if (specs.length) {
+      h += '<dl class="pr-specs">' + specs.map(function (s) {
         return '<div><dt>' + esc(s.k) + '</dt><dd>' + nums(s.v) + '</dd></div>';
       }).join('') + '</dl>';
     }
     if (p.options && p.options.length) {
       h += '<div class="pr-opts">' + p.options.map(function (o) { return optionHtml(p, o); }).join('') + '</div>';
     }
-    h += '</div><div class="pr-buy"><div class="pr-price"><b class="num">' + fmt(p.price) + '</b><span>' + esc(CUR) + '</span>' +
+    h += '</div><div class="pr-buy"><div class="pr-row"><div class="pr-price"><b class="num">' + fmt(p.price) + '</b><span>' + esc(CUR) + '</span>' +
       (p.per ? '<small>' + esc(p.per) + '</small>' : '') + '</div>';
     if (p.qty) {
       h += '<div class="pr-qty"><span>' + esc(p.qty) + '</span>' + stepper(p.qtyDefault || 1, 'عدد: ' + p.name) + '</div>';
     }
+    h += '</div>';
     h += '<a class="btn pr-order" href="#" target="_blank" rel="noopener">' + WA_ICON + '<span>اطلب عبر واتساب<span class="vh">، ' + esc(p.name) + '</span></span></a>' +
       '<button type="button" class="pr-add">أضف إلى طلبي<span class="vh">، ' + esc(p.name) + '</span></button></div></article>';
     return h;
@@ -111,9 +123,9 @@
     html += '<section class="section store-sec' + (ci % 2 ? ' section--sand' : '') + '" id="' + c.id + '" data-cat="' + c.id + '">' +
       '<div class="container"><div class="cat-head' + (c.image ? ' has-fig' : '') + '"><div class="section-head"><span class="eyebrow">' + esc(c.eyebrow) + '</span>' +
       '<h2 class="title">' + esc(c.title) + '</h2><p class="lead">' + esc(c.lead) + '</p></div>' +
-      (c.image ? '<figure class="cat-fig"><img src="' + esc(c.image) + '" alt="' + esc(c.imageAlt || c.title) + '" width="800" height="1000" loading="lazy" decoding="async"></figure>' : '') +
-      '</div>' +
-      '<div class="pr-list">' + items.map(function (p, i) { return rowHtml(p, i + 1, counter++); }).join('') + '</div></div></section>';
+      (c.image ? '<figure class="media cat-fig"><img src="' + esc(c.image) + '" alt="' + esc(c.imageAlt || c.title) + '" width="960" height="720" loading="lazy" decoding="async"><span class="mark" aria-hidden="true"></span></figure>' : '') +
+      '</div><div class="shop-grid">' +
+      items.map(function (p, i) { return rowHtml(p, counter++, (i % 3) + 1, c); }).join('') + '</div></div></section>';
   });
   catalog.innerHTML = html;
 
@@ -233,6 +245,7 @@
       .filter(Boolean).join('، ');
   }
   function renderCart(bump) {
+    var count = cart.reduce(function (n, it) { return n + 1 * (it.qty > 0); }, 0);
     var total = cartTotal();
 
     fab.hidden = !cart.length;
