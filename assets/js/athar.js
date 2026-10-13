@@ -65,6 +65,7 @@
             '<a href="programs.html#work">أعمالنا الإعلامية</a>' +
             '<a href="programs.html#calendar">رزنامة أثر</a>' +
             '<a href="museum.html">متحف أثر الوقفي</a>' +
+            '<a href="store.html">متجر أثر</a>' +
           '</nav></div>' +
           '<div><h4>مبادرات</h4><nav aria-label="روابط المبادرات">' +
             '<a href="certificate.html">الوقف المعنوي</a>' +
@@ -126,7 +127,7 @@
   }
 
   /* ---------- إقفال الوسائط: لا قائمة سياق ولا سحب ولا حفظ مباشر ---------- */
-  var MEDIA = 'img, video, canvas, picture, source, .strip, .gallery, .program-portrait, .figure-block, .cert-canvas, .frame, .brand, .footer-brand';
+  var MEDIA = 'img, video, canvas, picture, source, .strip, .gallery, .program-portrait, .figure-block, .pr-fig, .cat-fig, .cert-canvas, .frame, .brand, .footer-brand';
   document.addEventListener('contextmenu', function (e) {
     var t = e.target;
     if (t && t.closest && t.closest(MEDIA)) e.preventDefault();
