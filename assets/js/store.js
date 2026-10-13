@@ -93,10 +93,17 @@
     }).join('') + '</dl>';
   }
 
+  /* رقم البطاقة ضمن القائمة، ونقش حلقات خافت يملأ الفراغ بهوية أثر */
+  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  function bodyDeco(i) {
+    return RINGS.replace('class="rings"', 'class="rings pr-deco"') +
+      '<span class="pr-idx" aria-hidden="true"><span class="num">' + pad2(i + 1) + ' / ' + pad2(items.length) + '</span></span>';
+  }
+
   function rowHtml(p, i, tone) {
     var h = '<article class="pr t' + tone + '" id="' + p.id + '" data-id="' + p.id + '" style="--i:' + i + '">';
     h += mediaHtml(p, tone);
-    h += '<div class="pr-body"><h3 class="pr-name">' + esc(p.name) + '</h3><p class="pr-desc">' + esc(p.desc) + '</p>';
+    h += '<div class="pr-body">' + bodyDeco(i) + '<h3 class="pr-name">' + esc(p.name) + '</h3><p class="pr-desc">' + esc(p.desc) + '</p>';
     h += specsHtml((p.specs || []).filter(function (s) { return !(p.tile && s.k === 'العمق'); }));
     if (p.options && p.options.length) {
       h += '<div class="pr-opts">' + p.options.map(function (o) { return optionHtml(p, o); }).join('') + '</div>';
@@ -114,7 +121,7 @@
   /* بطاقة الآبار في المتجر: بوابة إلى صفحتها المستقلة */
   function gateHtml(g, i) {
     return '<article class="pr pr--gate t3" id="' + g.id + '" data-id="' + g.id + '" style="--i:' + i + '">' + mediaHtml(g) +
-      '<div class="pr-body"><h3 class="pr-name">' + esc(g.name) + '</h3><p class="pr-desc">' + esc(g.desc) + '</p>' + specsHtml(g.specs || []) + '</div>' +
+      '<div class="pr-body">' + bodyDeco(i) + '<h3 class="pr-name">' + esc(g.name) + '</h3><p class="pr-desc">' + esc(g.desc) + '</p>' + specsHtml(g.specs || []) + '</div>' +
       '<div class="pr-buy"><div class="pr-row"><div class="pr-price"><small>تبدأ من</small><b class="num">' + fmt(g.price) + '</b><span>' + esc(CUR) + '</span></div></div>' +
       '<a class="btn pr-go" href="' + esc(g.href) + '"><span>' + esc(g.cta) + '</span>' +
       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a></div></article>';
@@ -185,6 +192,7 @@
       countries: conf.country ? (p.options || []).reduce(function (a, o) { return o.key === 'country' ? a.concat(o.choices) : a; }, []) : [] };
   });
 
+  var stackReady = false;
   function applyFilters() {
     var toks = norm(state.q).split(' ').filter(Boolean), shown = 0;
     model.forEach(function (m) {
@@ -197,16 +205,12 @@
       if (state.s) rank = (state.s === 'asc' ? m.p.price : -m.p.price) * 1000 + m.i;
       m.el.style.order = rank;
     });
-    /* آخر بطاقة وحدها في صفها تتمدد على العرض كله، فلا يبقى فراغٌ مبتور */
+    /* ترتيب الطبقات يتبع الترتيب المرئي: البطاقة اللاحقة تغطي السابقة */
     var vis = model.filter(function (m) { return !m.el.hidden; });
     vis.sort(function (a, b) { return (parseFloat(a.el.style.order) || 0) - (parseFloat(b.el.style.order) || 0); });
-    model.forEach(function (m) { m.el.classList.remove('wide3', 'wide2'); });
-    if (vis.length > 1) {
-      var last = vis[vis.length - 1].el;
-      if (vis.length % 3 === 1) last.classList.add('wide3');
-      if (vis.length % 2 === 1) last.classList.add('wide2');
-    }
+    vis.forEach(function (m, k) { m.el.style.zIndex = k + 1; });
     noneEl.hidden = shown > 0;
+    if (stackReady) layoutStack();
     grid.hidden = shown === 0;
     cEl.innerHTML = shown === model.length ? '<span class="num">' + shown + '</span> ' + (page === 'wells' ? 'تصاميم' : 'خدمات')
       : 'يُعرض <span class="num">' + shown + '</span> من <span class="num">' + model.length + '</span>';
@@ -237,6 +241,36 @@
     qEl.value = ''; state = { f: '', q: '', c: '', s: state.s }; if (cSel) cSel.value = ''; setChip(''); applyFilters();
   });
   applyFilters();
+
+  /* ---------- تكديس البطاقات عند التمرير ----------
+     كل بطاقة تثبت في أعلى الشاشة، وتنزلق التالية فوقها.
+     يُحسب موضع التثبيت من ارتفاع البطاقة نفسها، فتظهر كاملةً دون أن يُقصّ شيءٌ من تفاصيلها.
+     إن كانت البطاقة أطول من الشاشة (شاشاتٌ قصيرة) يُترك التمرير العادي. */
+  var hdr = document.getElementById('header');
+  function layoutStack() {
+    var vh = window.innerHeight, tall = 0;
+    var TOP = hdr ? Math.round(hdr.getBoundingClientRect().bottom) + 12 : 96;
+    model.forEach(function (m) { m.el.style.minHeight = ''; });
+    var visible = model.filter(function (m) { return !m.el.hidden; });
+    visible.forEach(function (m) { tall = Math.max(tall, m.el.offsetHeight); });
+    var ok = tall > 0 && tall <= vh * 1.35;
+    grid.classList.toggle('is-stack', ok);
+    if (!ok) return;
+    visible.forEach(function (m) {
+      m.el.style.minHeight = tall + 'px';
+      m.el.style.top = Math.min(TOP, Math.round(vh - tall - 16)) + 'px';
+    });
+  }
+  var stackTimer = 0;
+  function queueStack() { clearTimeout(stackTimer); stackTimer = setTimeout(layoutStack, 60); }
+  window.addEventListener('resize', queueStack);
+  window.addEventListener('load', layoutStack);
+  grid.addEventListener('change', queueStack);
+  grid.addEventListener('input', queueStack);
+  grid.addEventListener('click', queueStack);
+  $$('img', grid).forEach(function (im) { im.addEventListener('load', queueStack); });
+  stackReady = true;
+  layoutStack();
 
   var hashId = location.hash.replace('#', '');
   if (hashId && document.getElementById(hashId)) {
