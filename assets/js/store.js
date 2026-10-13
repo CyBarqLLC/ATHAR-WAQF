@@ -80,7 +80,7 @@
       return '<div class="media"><img src="' + esc(p.image) + '" alt="' + esc(p.imageAlt || p.name) + '" width="960" height="720" loading="lazy" decoding="async"><span class="mark" aria-hidden="true"></span></div>';
     }
     if (p.tile) {
-      return '<div class="media media--tile t' + tone + '" aria-hidden="true">' + RINGS +
+      return '<div class="media media--tile" aria-hidden="true">' + RINGS +
         '<b class="tile-n num">' + esc(p.tile.n) + '</b><span class="tile-u">' + esc(p.tile.u || S.tileLabel || 'متراً · عمق البئر') + '</span><span class="mark"></span></div>';
     }
     return '';
@@ -94,7 +94,7 @@
   }
 
   function rowHtml(p, i, tone) {
-    var h = '<article class="pr" id="' + p.id + '" data-id="' + p.id + '" style="--i:' + i + '">';
+    var h = '<article class="pr t' + tone + '" id="' + p.id + '" data-id="' + p.id + '" style="--i:' + i + '">';
     h += mediaHtml(p, tone);
     h += '<div class="pr-body"><h3 class="pr-name">' + esc(p.name) + '</h3><p class="pr-desc">' + esc(p.desc) + '</p>';
     h += specsHtml((p.specs || []).filter(function (s) { return !(p.tile && s.k === 'العمق'); }));
@@ -113,7 +113,7 @@
 
   /* بطاقة الآبار في المتجر: بوابة إلى صفحتها المستقلة */
   function gateHtml(g, i) {
-    return '<article class="pr pr--gate" id="' + g.id + '" data-id="' + g.id + '" style="--i:' + i + '">' + mediaHtml(g) +
+    return '<article class="pr pr--gate t3" id="' + g.id + '" data-id="' + g.id + '" style="--i:' + i + '">' + mediaHtml(g) +
       '<div class="pr-body"><h3 class="pr-name">' + esc(g.name) + '</h3><p class="pr-desc">' + esc(g.desc) + '</p>' + specsHtml(g.specs || []) + '</div>' +
       '<div class="pr-buy"><div class="pr-row"><div class="pr-price"><small>تبدأ من</small><b class="num">' + fmt(g.price) + '</b><span>' + esc(CUR) + '</span></div></div>' +
       '<a class="btn pr-go" href="' + esc(g.href) + '"><span>' + esc(g.cta) + '</span>' +
