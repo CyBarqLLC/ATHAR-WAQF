@@ -39,6 +39,7 @@
 
   /* ---------- الصفحة الحالية في القائمة ---------- */
   var here = location.pathname.split('/').pop() || 'index.html';
+  if (here === 'wells.html') here = 'store.html';
   $$('#nav a').forEach(function (a) {
     var href = (a.getAttribute('href') || '').split('#')[0];
     if (href && href === here) a.setAttribute('aria-current', 'page');

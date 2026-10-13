@@ -75,27 +75,29 @@
 
   var RINGS = '<svg class="rings" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="200" cy="150" r="46"/><circle cx="200" cy="150" r="84"/><circle cx="200" cy="150" r="122"/><circle cx="200" cy="150" r="160"/><circle cx="200" cy="150" r="198"/></g></svg>';
 
-  function mediaHtml(p, tone, cat) {
+  function mediaHtml(p, tone) {
     if (p.image) {
-      return '<div class="media"><img src="' + esc(p.image) + '" alt="' + esc(p.name) + '" width="960" height="720" loading="lazy" decoding="async"><span class="mark" aria-hidden="true"></span></div>';
+      return '<div class="media"><img src="' + esc(p.image) + '" alt="' + esc(p.imageAlt || p.name) + '" width="960" height="720" loading="lazy" decoding="async"><span class="mark" aria-hidden="true"></span></div>';
     }
     if (p.tile) {
       return '<div class="media media--tile t' + tone + '" aria-hidden="true">' + RINGS +
-        '<b class="tile-n num">' + esc(p.tile.n) + '</b><span class="tile-u">' + esc(p.tile.u || cat.tileLabel || '') + '</span><span class="mark"></span></div>';
+        '<b class="tile-n num">' + esc(p.tile.n) + '</b><span class="tile-u">' + esc(p.tile.u || S.tileLabel || 'متراً · عمق البئر') + '</span><span class="mark"></span></div>';
     }
     return '';
   }
 
-  function rowHtml(p, i, tone, cat) {
+  function specsHtml(list) {
+    if (!list.length) return '';
+    return '<dl class="pr-specs">' + list.map(function (s) {
+      return '<div><dt>' + esc(s.k) + '</dt><dd>' + nums(s.v) + '</dd></div>';
+    }).join('') + '</dl>';
+  }
+
+  function rowHtml(p, i, tone) {
     var h = '<article class="pr" id="' + p.id + '" data-id="' + p.id + '" style="--i:' + i + '">';
-    h += mediaHtml(p, tone, cat);
+    h += mediaHtml(p, tone);
     h += '<div class="pr-body"><h3 class="pr-name">' + esc(p.name) + '</h3><p class="pr-desc">' + esc(p.desc) + '</p>';
-    var specs = (p.specs || []).filter(function (s) { return !(p.tile && s.k === 'العمق'); });
-    if (specs.length) {
-      h += '<dl class="pr-specs">' + specs.map(function (s) {
-        return '<div><dt>' + esc(s.k) + '</dt><dd>' + nums(s.v) + '</dd></div>';
-      }).join('') + '</dl>';
-    }
+    h += specsHtml((p.specs || []).filter(function (s) { return !(p.tile && s.k === 'العمق'); }));
     if (p.options && p.options.length) {
       h += '<div class="pr-opts">' + p.options.map(function (o) { return optionHtml(p, o); }).join('') + '</div>';
     }
@@ -104,10 +106,18 @@
     if (p.qty) {
       h += '<div class="pr-qty"><span>' + esc(p.qty) + '</span>' + stepper(p.qtyDefault || 1, 'عدد: ' + p.name) + '</div>';
     }
-    h += '</div>';
-    h += '<a class="btn pr-order" href="#" target="_blank" rel="noopener">' + WA_ICON + '<span>اطلب عبر واتساب<span class="vh">، ' + esc(p.name) + '</span></span></a>' +
+    h += '</div><a class="btn pr-order" href="#" target="_blank" rel="noopener">' + WA_ICON + '<span>اطلب عبر واتساب<span class="vh">، ' + esc(p.name) + '</span></span></a>' +
       '<button type="button" class="pr-add">أضف إلى طلبي<span class="vh">، ' + esc(p.name) + '</span></button></div></article>';
     return h;
+  }
+
+  /* بطاقة الآبار في المتجر: بوابة إلى صفحتها المستقلة */
+  function gateHtml(g, i) {
+    return '<article class="pr pr--gate" id="' + g.id + '" data-id="' + g.id + '" style="--i:' + i + '">' + mediaHtml(g) +
+      '<div class="pr-body"><h3 class="pr-name">' + esc(g.name) + '</h3><p class="pr-desc">' + esc(g.desc) + '</p>' + specsHtml(g.specs || []) + '</div>' +
+      '<div class="pr-buy"><div class="pr-row"><div class="pr-price"><small>تبدأ من</small><b class="num">' + fmt(g.price) + '</b><span>' + esc(CUR) + '</span></div></div>' +
+      '<a class="btn pr-go" href="' + esc(g.href) + '"><span>' + esc(g.cta) + '</span>' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a></div></article>';
   }
 
   function stepper(val, label) {
@@ -116,42 +126,121 @@
       '<button type="button" class="qty-b" data-step="1" aria-label="زيادة">+</button></div>';
   }
 
-  var counter = 0, html = '';
-  S.categories.forEach(function (c, ci) {
-    var items = S.products.filter(function (p) { return p.cat === c.id; });
-    if (!items.length) return;
-    html += '<section class="section store-sec' + (ci % 2 ? ' section--sand' : '') + '" id="' + c.id + '" data-cat="' + c.id + '">' +
-      '<div class="container"><div class="cat-head' + (c.image ? ' has-fig' : '') + '"><div class="section-head"><span class="eyebrow">' + esc(c.eyebrow) + '</span>' +
-      '<h2 class="title">' + esc(c.title) + '</h2><p class="lead">' + esc(c.lead) + '</p></div>' +
-      (c.image ? '<figure class="media cat-fig"><img src="' + esc(c.image) + '" alt="' + esc(c.imageAlt || c.title) + '" width="960" height="720" loading="lazy" decoding="async"><span class="mark" aria-hidden="true"></span></figure>' : '') +
-      '</div><div class="shop-grid">' +
-      items.map(function (p, i) { return rowHtml(p, counter++, (i % 3) + 1, c); }).join('') + '</div></div></section>';
+  /* ---------- بحث وتصفية وترتيب ---------- */
+  /* توحيد الحروف العربية ليجد البحث الكلمة بأي رسم: همزات، تاء مربوطة، ياء، تشكيل */
+  function norm(t) {
+    return String(t).toLowerCase()
+      .replace(/[ً-ٰٟـ]/g, '')
+      .replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
+      .replace(/[^\w؀-ۿ\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function hay(p) {
+    var t = [p.name, p.desc, p.kw || '', (p.chips || []).join(' ')];
+    (p.specs || []).forEach(function (s) { t.push(s.k, s.v); });
+    (p.options || []).forEach(function (o) { t.push(o.label); (o.choices || []).forEach(function (c) { t.push(c); }); });
+    return norm(t.join(' '));
+  }
+
+  var page = catalog.getAttribute('data-page') || 'store';
+  var conf = (S.pages && S.pages[page]) || { cats: ['khayr'] };
+  var items = S.products.filter(function (p) { return conf.cats.indexOf(p.cat) > -1; });
+  if (page === 'store' && S.gateway) items = items.concat([S.gateway]);
+
+  var chipList = [];
+  items.forEach(function (p) { (p.chips || []).forEach(function (c) { if (chipList.indexOf(c) < 0) chipList.push(c); }); });
+  var countries = [];
+  if (conf.country) items.forEach(function (p) {
+    (p.options || []).forEach(function (o) {
+      if (o.key === 'country') o.choices.forEach(function (c) { if (countries.indexOf(c) < 0) countries.push(c); });
+    });
   });
+
+  var SEARCH_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>';
+  var tb = '<div class="tb"><div class="tb-top">' +
+    '<div class="search"><label class="vh" for="q">ابحث في المتجر</label>' + SEARCH_ICON +
+    '<input id="q" type="search" placeholder="' + (page === 'wells' ? 'ابحث عن بلد أو نوع بئر' : 'ابحث عن خدمة أو بلد') + '" autocomplete="off" enterkeyhint="search">' +
+    '<button type="button" class="search-x" id="qx" hidden aria-label="مسح البحث"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+  if (countries.length) {
+    tb += '<label class="sel"><span>الدولة</span><select id="fCountry"><option value="">كل الدول</option>' +
+      countries.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('') + '</select></label>';
+  }
+  tb += '<label class="sel"><span>الترتيب</span><select id="fSort"><option value="">الافتراضي</option>' +
+    '<option value="asc">الأقل سعرًا</option><option value="desc">الأعلى سعرًا</option></select></label></div>';
+  if (chipList.length > 1) {
+    tb += '<div class="tb-chips" id="fChips" role="group" aria-label="تصفية حسب النوع"><button type="button" class="fchip" data-f="" aria-pressed="true">الكل</button>' +
+      chipList.map(function (c) { return '<button type="button" class="fchip" data-f="' + esc(c) + '" aria-pressed="false">' + esc(c) + '</button>'; }).join('') + '</div>';
+  }
+  tb += '<p class="tb-count" id="fCount" role="status" aria-live="polite"></p></div>';
+
+  var html = '<section class="shop" id="shop"><div class="container">' + tb + '<div class="shop-grid" id="shopGrid">' +
+    items.map(function (p, i) { return p === S.gateway ? gateHtml(p, i) : rowHtml(p, i, (i % 3) + 1); }).join('') +
+    '</div><div class="shop-none" id="shopNone" hidden><p>لا نتيجة تطابق بحثك.</p><button type="button" class="link-btn" id="shopReset">عرض كل المنتجات</button></div></div></section>';
   catalog.innerHTML = html;
 
-  /* ---------- التبويبات ---------- */
-  var tabsEl = $('#storeTabs');
-  if (tabsEl) {
-    tabsEl.innerHTML = '<button type="button" class="store-tab" data-f="all" aria-pressed="true">الكل</button>' +
-      S.categories.map(function (c) {
-        return '<button type="button" class="store-tab" data-f="' + c.id + '" aria-pressed="false">' + esc(c.tab) + '</button>';
-      }).join('');
-    var setFilter = function (f) {
-      $$('.store-tab', tabsEl).forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-f') === f)); });
-      $$('.store-sec', catalog).forEach(function (s) { s.hidden = !(f === 'all' || s.getAttribute('data-cat') === f); });
-    };
-    tabsEl.addEventListener('click', function (e) {
-      var b = e.target.closest('.store-tab');
-      if (b) setFilter(b.getAttribute('data-f'));
+  var grid = $('#shopGrid'), qEl = $('#q'), qx = $('#qx'), cEl = $('#fCount'), noneEl = $('#shopNone');
+  var cardEls = $$('.pr', grid);
+  var state = { f: '', q: '', c: '', s: '' };
+  var model = items.map(function (p, i) {
+    return { p: p, el: cardEls[i], hay: hay(p), i: i,
+      countries: conf.country ? (p.options || []).reduce(function (a, o) { return o.key === 'country' ? a.concat(o.choices) : a; }, []) : [] };
+  });
+
+  function applyFilters() {
+    var toks = norm(state.q).split(' ').filter(Boolean), shown = 0;
+    model.forEach(function (m) {
+      var ok = (!state.f || (m.p.chips || []).indexOf(state.f) > -1) &&
+               (!state.c || m.countries.indexOf(state.c) > -1) &&
+               toks.every(function (t) { return m.hay.indexOf(t) > -1; });
+      m.el.hidden = !ok;
+      if (ok) shown++;
+      var rank = m.i;
+      if (state.s) rank = (state.s === 'asc' ? m.p.price : -m.p.price) * 1000 + m.i;
+      m.el.style.order = rank;
     });
-    var h = location.hash.replace('#', '');
-    if (h && byId[h]) {
-      /* رابط مباشر إلى منتج بعينه */
-      var tgt = document.getElementById(h);
-      if (tgt) setTimeout(function () { tgt.scrollIntoView({ block: 'center' }); }, 300);
-    } else if (h && S.categories.some(function (c) { return c.id === h; })) {
-      setFilter(h);
+    /* آخر بطاقة وحدها في صفها تتمدد على العرض كله، فلا يبقى فراغٌ مبتور */
+    var vis = model.filter(function (m) { return !m.el.hidden; });
+    vis.sort(function (a, b) { return (parseFloat(a.el.style.order) || 0) - (parseFloat(b.el.style.order) || 0); });
+    model.forEach(function (m) { m.el.classList.remove('wide3', 'wide2'); });
+    if (vis.length > 1) {
+      var last = vis[vis.length - 1].el;
+      if (vis.length % 3 === 1) last.classList.add('wide3');
+      if (vis.length % 2 === 1) last.classList.add('wide2');
     }
+    noneEl.hidden = shown > 0;
+    grid.hidden = shown === 0;
+    cEl.innerHTML = shown === model.length ? '<span class="num">' + shown + '</span> ' + (page === 'wells' ? 'تصاميم' : 'خدمات')
+      : 'يُعرض <span class="num">' + shown + '</span> من <span class="num">' + model.length + '</span>';
+    qx.hidden = !state.q;
+  }
+  function setChip(f) {
+    state.f = f;
+    $$('.fchip').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-f') === f)); });
+  }
+  qEl.addEventListener('input', function () { state.q = qEl.value; applyFilters(); });
+  qx.addEventListener('click', function () { qEl.value = ''; state.q = ''; applyFilters(); qEl.focus(); });
+  var chipsEl = $('#fChips');
+  if (chipsEl) chipsEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.fchip');
+    if (b) { setChip(b.getAttribute('data-f')); applyFilters(); }
+  });
+  var cSel = $('#fCountry');
+  if (cSel) cSel.addEventListener('change', function () {
+    state.c = cSel.value; applyFilters();
+    /* اختيار الدولة هنا يعبّئها تلقائيًا في بطاقات الآبار */
+    if (state.c) model.forEach(function (m) {
+      var sel = $('select[data-opt="country"]', m.el);
+      if (sel && m.countries.indexOf(state.c) > -1) { sel.value = state.c; syncRow(m.el); }
+    });
+  });
+  $('#fSort').addEventListener('change', function (e) { state.s = e.target.value; applyFilters(); });
+  $('#shopReset').addEventListener('click', function () {
+    qEl.value = ''; state = { f: '', q: '', c: '', s: state.s }; if (cSel) cSel.value = ''; setChip(''); applyFilters();
+  });
+  applyFilters();
+
+  var hashId = location.hash.replace('#', '');
+  if (hashId && document.getElementById(hashId)) {
+    setTimeout(function () { document.getElementById(hashId).scrollIntoView({ block: 'center' }); }, 300);
   }
 
   /* ---------- حالة صف المنتج ---------- */
@@ -176,7 +265,7 @@
     if (wrap) wrap.classList.add('is-missing');
     el.focus();
   }
-  $$('.pr', catalog).forEach(syncRow);
+  $$('.pr:not(.pr--gate)', catalog).forEach(syncRow);
 
   catalog.addEventListener('input', function (e) { var r = e.target.closest('.pr'); if (r) syncRow(r); });
   catalog.addEventListener('change', function (e) {
