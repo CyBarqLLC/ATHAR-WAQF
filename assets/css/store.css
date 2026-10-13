@@ -373,3 +373,7 @@
 }
 
 @media (max-width:620px){.shop-grid{gap:56px}}
+
+/* المسافة بين المنتجات */
+.shop-grid{gap:clamp(64px,7vw,104px)}
+@media (max-width:620px){.shop-grid{gap:64px}}
